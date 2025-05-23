@@ -11,6 +11,8 @@ namespace ControlDeGastosNetCore.Repository
         void Update(Gasto gasto);
         void Delete(Gasto gasto);
         void Save();
+        Task<List<Gasto>> ObtenerPorMesYAnioAsync(int mes, int anio);
+
     }
 }
 

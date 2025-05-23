@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using ControlDeGastosNetCore.Models;
+﻿using ControlDeGastosNetCore.Models;
 using ControlDeGastosNetCore.Repository;
 using ControlDeGastosNetCore.Viewmodels;
 
@@ -9,46 +8,12 @@ namespace ControlDeGastosNetCore.Services
     {
         private readonly IGastoRepository _repository;
 
-        public GastoService(IGastoRepository repository)
+        private readonly IPresupuestoRepository _presupuestoRepository;
+
+        public GastoService(IGastoRepository repository, IPresupuestoRepository presupuestoRepository)
         {
             _repository = repository;
-        }
-
-        public IEnumerable<Gasto> GetAll()
-        {
-            return _repository.GetAll();
-        }
-
-        public Gasto GetById(int id)
-        {
-            return _repository.GetById(id);
-        }
-
-        public void Create(Gasto gasto)
-        {
-            _repository.Add(gasto);
-            _repository.Save();
-        }
-
-        public void Update(Gasto gasto)
-        {
-            _repository.Update(gasto);
-            _repository.Save();
-        }
-
-        public void Delete(int id)
-        {
-            var gasto = _repository.GetById(id);
-            if (gasto != null)
-            {
-                _repository.Delete(gasto);
-                _repository.Save();
-            }
-        }
-
-        public Task<GastosResumenViewmodel> ObtenerResumenDelMes(int? mes, int? anio)
-        {
-            throw new NotImplementedException();
+            _presupuestoRepository = presupuestoRepository;
         }
 
         public Task CrearGastoAsync(Gasto gasto)
@@ -56,58 +21,50 @@ namespace ControlDeGastosNetCore.Services
             throw new NotImplementedException();
         }
 
-        public Task<Gasto> ObtenerGastoPorIdAsync(int id)
+        public void Create(Gasto gasto)
         {
             throw new NotImplementedException();
         }
 
-        public Task EditarGastoAsync(Gasto gasto)
+        public void Delete(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Task EliminarGastoAsync(int id)
+        public IEnumerable<Gasto> GetAll()
         {
             throw new NotImplementedException();
         }
 
-        public Task<GastosResumenViewmodel> FiltrarPorCategoria(int? categoriaId, int? mes, int? anio)
+        public Gasto GetById(int id)
         {
             throw new NotImplementedException();
         }
 
-        Task<GastosResumenViewmodel> IGastoService.ObtenerResumenDelMes(int? mes, int? anio)
+        public async Task<GastosResumenViewmodel> ObtenerResumenDelMes(int? mes, int? anio)
         {
-            throw new NotImplementedException();
+            var fechaActual = DateTime.Now;
+            int mesValor = mes ?? fechaActual.Month;
+            int anioValor = anio ?? fechaActual.Year;
+
+            var gastos = await _repository.ObtenerPorMesYAnioAsync(mesValor, anioValor);
+            var presupuesto = await _presupuestoRepository.ObtenerPorMesYAnioAsync(mesValor, anioValor);
+
+            var totalGastado = gastos.Sum(g => g.Monto);
+
+            return new GastosResumenViewmodel
+            {
+                Gastos = gastos,
+                TotalGastado = totalGastado,
+                MontoPresupuesto = presupuesto?.Monto,
+                Periodo = new DateTime(anioValor, mesValor, 1),
+                CategoriaSeleccionada = "",
+                CategoriaSeleccionadaId = null,
+                Categorias = gastos.Select(g => g.Categoria).Distinct().ToList()
+            };
         }
 
-        IEnumerable<Gasto> IGastoService.GetAll()
-        {
-            throw new NotImplementedException();
-        }
-
-        Gasto IGastoService.GetById(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        void IGastoService.Create(Gasto gasto)
-        {
-            throw new NotImplementedException();
-        }
-
-        void IGastoService.Update(Gasto gasto)
-        {
-            throw new NotImplementedException();
-        }
-
-        void IGastoService.Delete(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-
-        Task IGastoService.CrearGastoAsync(Gasto gasto)
+        public void Update(Gasto gasto)
         {
             throw new NotImplementedException();
         }

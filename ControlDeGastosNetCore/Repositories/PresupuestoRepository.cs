@@ -1,7 +1,8 @@
-﻿using ControlDeGastosNetCore.Models;
+﻿using System.Linq;
+using ControlDeGastosNetCore.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace ControlDeGastosNetCore.Repositories
+namespace ControlDeGastosNetCore.Repository
 {
     public class PresupuestoRepository : IPresupuestoRepository
     {
@@ -14,10 +15,7 @@ namespace ControlDeGastosNetCore.Repositories
 
         public List<Presupuesto> ObtenerTodos()
         {
-            return _context.Presupuestos
-                .OrderByDescending(p => p.Año)
-                .ThenByDescending(p => p.Mes)
-                .ToList();
+            return _context.Presupuestos.ToList();
         }
 
         public Presupuesto ObtenerPorId(int id)
@@ -30,27 +28,35 @@ namespace ControlDeGastosNetCore.Repositories
             return _context.Presupuestos.Any(p => p.Mes.Month == mes && p.Año.Year == anio);
         }
 
+        public Presupuesto? ObtenerPorMesYAnio(int mes, int anio)
+        {
+            return _context.Presupuestos
+                .FirstOrDefault(p => p.Mes.Month == mes && p.Año.Year == anio);
+        }
+
         public void Crear(Presupuesto presupuesto)
         {
             _context.Presupuestos.Add(presupuesto);
-            _context.SaveChanges();
         }
 
         public void Editar(Presupuesto presupuesto)
         {
             _context.Entry(presupuesto).State = EntityState.Modified;
-            _context.SaveChanges();
         }
 
         public void Eliminar(int id)
         {
-            var presupuesto = ObtenerPorId(id);
+            var presupuesto = _context.Presupuestos.Find(id);
             if (presupuesto != null)
             {
                 _context.Presupuestos.Remove(presupuesto);
-                _context.SaveChanges();
             }
         }
-    }
 
+        public async Task<Presupuesto?> ObtenerPorMesYAnioAsync(int mes, int anio)
+        {
+            return await _context.Presupuestos
+                .FirstOrDefaultAsync(p => p.Mes.Month == mes && p.Año.Year == anio);
+        }
+    }
 }

@@ -11,7 +11,7 @@ public class GastosController : Controller
         _gastoService = gastoService;
     }
 
-    public async Task<IActionResult> Index(int? mes, int? anio)
+    public async Task<IActionResult> Resumen(int? mes, int? anio)
     {
         var resumen = await _gastoService.ObtenerResumenDelMes(mes, anio);
         return View(resumen);

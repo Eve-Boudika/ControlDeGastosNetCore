@@ -3,6 +3,7 @@ using ControlDeGastosNetCore.Models;
 using ControlDeGastosNetCore.Services;
 using ControlDeGastosNetCore.Repository;
 using ControlDeGastosNetCore.Repositories;
+using System.Globalization;
 
 namespace ControlDeGastosNetCore
 {
@@ -22,6 +23,10 @@ namespace ControlDeGastosNetCore
             builder.Services.AddScoped<IGastoService, GastoService>();
             builder.Services.AddScoped<IPresupuestoService, PresupuestoService>();
             builder.Services.AddScoped<IPresupuestoRepository, PresupuestoRepository>();
+
+            var cultureInfo = new CultureInfo("es-AR");
+            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
             var app = builder.Build();
 

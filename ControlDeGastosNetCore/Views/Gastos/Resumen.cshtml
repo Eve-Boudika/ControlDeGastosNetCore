@@ -1,0 +1,63 @@
+﻿@model ControlDeGastosNetCore.Viewmodels.GastosResumenViewmodel
+
+@{
+    ViewData["Title"] = "Resumen de Gastos";
+}
+
+<h2 class="mb-4">Resumen de Gastos - @Model.Periodo.ToString("MMMM yyyy")</h2>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-bg-light mb-3">
+            <div class="card-header">Presupuesto</div>
+            <div class="card-body">
+                <h5 class="card-title">@Model.MontoPresupuesto?.ToString("C") ?? "No definido"</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-bg-light mb-3">
+            <div class="card-header">Total Gastado</div>
+            <div class="card-body">
+                <h5 class="card-title">@Model.TotalGastado.ToString("C")</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-bg-light mb-3">
+            <div class="card-header">Monto Disponible</div>
+            <div class="card-body">
+                <h5 class="card-title">@Model.MontoDisponible.ToString("C")</h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.Gastos != null && Model.Gastos.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Categoría</th>
+                <th>Descripción</th>
+                <th>Monto</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var gasto in Model.Gastos)
+            {
+                <tr>
+                    <td>@gasto.Fecha.ToString("dd/MM/yyyy")</td>
+                    <td>@gasto.Categoria?.Nombre</td>
+                    <td>@gasto.Detalle</td>
+                    <td>@gasto.Monto.ToString("C")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info">No hay gastos registrados para este período.</div>
+}

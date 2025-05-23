@@ -8,4 +8,5 @@ public interface IPresupuestoRepository
     void Crear(Presupuesto presupuesto);
     void Editar(Presupuesto presupuesto);
     void Eliminar(int id);
+    Task<Presupuesto?> ObtenerPorMesYAnioAsync(int mes, int anio);
 }

@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using ControlDeGastos.Services;
 using ControlDeGastosNetCore.Models;
 using ControlDeGastosNetCore.Viewmodels;
+using ControlDeGastosNetCore.Services;
 
-namespace ControlDeGastos.Controllers
+namespace ControlDeGastosNetCore.Controllers
 {
     public class CategoriasController : Controller
     {
