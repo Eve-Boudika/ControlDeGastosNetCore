@@ -4,7 +4,43 @@
     ViewData["Title"] = "Resumen de Gastos";
 }
 
-<h2 class="mb-4">Resumen de Gastos - @Model.Periodo.ToString("MMMM yyyy")</h2>
+<h2 class="mb-4">Resumen de Gastos </h2>
+<h3>@Model.Periodo.ToString("MMMM yyyy")</h3>
+
+<form method="get" asp-action="Resumen">
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <select name="mes" class="form-select">
+                @for (int i = 1; i <= 12; i++)
+                {
+                    var nombreMes = new DateTime(1, i, 1).ToString("MMMM");
+                    <option value="@i" selected="@(i == Model.Periodo.Month ? "selected" : null)">
+                        @nombreMes
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="col-md-4">
+            <select name="anio" class="form-select">
+                @{
+                    int anioActual = DateTime.Now.Year;
+                    int anioInicio = anioActual - 9;
+                }
+
+                @for (int anio = anioActual; anio >= anioInicio; anio--)
+                {
+                    <option value="@anio" selected="@(anio == Model.Periodo.Year ? "selected" : null)">
+                        @anio
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+        </div>
+    </div>
+</form>
+
 
 <div class="row mb-4">
     <div class="col-md-4">
