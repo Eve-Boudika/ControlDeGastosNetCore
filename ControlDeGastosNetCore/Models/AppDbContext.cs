@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using ControlDeGastosNetCore.Viewmodels;
 
 namespace ControlDeGastosNetCore.Models;
 
@@ -18,8 +19,6 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<Categoria> Categorias { get; set; }
 
     public virtual DbSet<Gasto> Gastos { get; set; }
-
-    public virtual DbSet<MigrationHistory> MigrationHistories { get; set; }
 
     public virtual DbSet<Presupuesto> Presupuestos { get; set; }
 
@@ -46,16 +45,6 @@ public partial class AppDbContext : DbContext
                 .HasConstraintName("FK_dbo.Gastos_dbo.Categorias_CategoriaId");
         });
 
-        modelBuilder.Entity<MigrationHistory>(entity =>
-        {
-            entity.HasKey(e => new { e.MigrationId, e.ContextKey }).HasName("PK_dbo.__MigrationHistory");
-
-            entity.ToTable("__MigrationHistory");
-
-            entity.Property(e => e.MigrationId).HasMaxLength(150);
-            entity.Property(e => e.ContextKey).HasMaxLength(300);
-            entity.Property(e => e.ProductVersion).HasMaxLength(32);
-        });
 
         modelBuilder.Entity<Presupuesto>(entity =>
         {
@@ -69,4 +58,6 @@ public partial class AppDbContext : DbContext
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+
+
 }

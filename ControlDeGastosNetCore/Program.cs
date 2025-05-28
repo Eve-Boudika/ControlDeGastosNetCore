@@ -23,6 +23,8 @@ namespace ControlDeGastosNetCore
             builder.Services.AddScoped<IGastoService, GastoService>();
             builder.Services.AddScoped<IPresupuestoService, PresupuestoService>();
             builder.Services.AddScoped<IPresupuestoRepository, PresupuestoRepository>();
+            builder.Services.AddScoped<ICategoriaService, CategoriaService>();
+            builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 
             var cultureInfo = new CultureInfo("es-AR");
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;

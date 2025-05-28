@@ -18,7 +18,9 @@ namespace ControlDeGastosNetCore.Services
 
         public Task CrearGastoAsync(Gasto gasto)
         {
-            throw new NotImplementedException();
+            _repository.Add(gasto);
+            _repository.Save();
+            return Task.CompletedTask; 
         }
 
         public void Create(Gasto gasto)

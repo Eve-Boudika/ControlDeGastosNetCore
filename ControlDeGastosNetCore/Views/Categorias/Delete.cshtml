@@ -1,0 +1,19 @@
+﻿@model ControlDeGastosNetCore.Models.Categoria
+
+@{
+    ViewData["Title"] = "Eliminar Categoría";
+}
+
+<h2>Eliminar Categoría</h2>
+
+<h4>¿Estás segura de que querés eliminar esta categoría?</h4>
+
+<div class="mb-3">
+    <strong>Nombre:</strong> @Model.Nombre
+</div>
+
+<form asp-action="DeleteConfirmed" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+    <a asp-action="Resumen" class="btn btn-secondary">Cancelar</a>
+</form>

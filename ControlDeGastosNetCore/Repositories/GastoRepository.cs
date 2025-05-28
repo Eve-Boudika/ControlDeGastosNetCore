@@ -24,20 +24,12 @@ namespace ControlDeGastosNetCore.Repository
 
         public IEnumerable<Gasto> GetAll()
         {
-            return _context.Gastos.Include(g => g.Categoria).ToList(); // si hay relación con Categoría
-        }
-
-        public IEnumerable<Gasto> ObtenerPorMesYAnio(int mes, int anio)
-        {
-            return _context.Gastos
-                .Include(g => g.Categoria)
-                .Where(g => g.Fecha.Month == mes && g.Fecha.Year == anio)
-                .ToList();
+            return _context.Gastos.Include(g => g.Categoria).ToList(); 
         }
 
         public Gasto GetById(int id)
         {
-            return _context.Gastos.Find(id);
+            return _context.Gastos.Include(g => g.Categoria).FirstOrDefault(g => g.Id == id);
         }
 
         public void Add(Gasto gasto)
