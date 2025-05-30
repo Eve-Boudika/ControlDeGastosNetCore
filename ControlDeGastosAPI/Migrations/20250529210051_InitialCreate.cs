@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace ControlDeGastosNetCore.Migrations
+namespace ControlDeGastosAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class Inicial : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -21,22 +21,7 @@ namespace ControlDeGastosNetCore.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_dbo.Categorias", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Presupuestos",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Año = table.Column<DateTime>(type: "datetime", nullable: false),
-                    Mes = table.Column<DateTime>(type: "datetime", nullable: false),
-                    Monto = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_dbo.Presupuestos", x => x.Id);
+                    table.PrimaryKey("PK_Categorias", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -46,15 +31,15 @@ namespace ControlDeGastosNetCore.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Monto = table.Column<int>(type: "int", nullable: false),
-                    Fecha = table.Column<DateTime>(type: "datetime", nullable: false),
+                    Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Detalle = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CategoriaId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_dbo.Gastos", x => x.Id);
+                    table.PrimaryKey("PK_Gastos", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_dbo.Gastos_dbo.Categorias_CategoriaId",
+                        name: "FK_Gastos_Categorias_CategoriaId",
                         column: x => x.CategoriaId,
                         principalTable: "Categorias",
                         principalColumn: "Id",
@@ -62,7 +47,7 @@ namespace ControlDeGastosNetCore.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_CategoriaId",
+                name: "IX_Gastos_CategoriaId",
                 table: "Gastos",
                 column: "CategoriaId");
         }
@@ -72,9 +57,6 @@ namespace ControlDeGastosNetCore.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Gastos");
-
-            migrationBuilder.DropTable(
-                name: "Presupuestos");
 
             migrationBuilder.DropTable(
                 name: "Categorias");
