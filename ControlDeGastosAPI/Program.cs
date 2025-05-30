@@ -1,4 +1,6 @@
 using ControlDeGastosAPI.Models;
+using ControlDeGastosAPI.Repositories;
+using ControlDeGastosAPI.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace ControlDeGastosAPI
@@ -13,6 +15,9 @@ namespace ControlDeGastosAPI
 
             builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+            builder.Services.AddScoped<ICategoriaService, CategoriaService>();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
