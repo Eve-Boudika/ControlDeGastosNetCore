@@ -1,57 +1,73 @@
-﻿using ControlDeGastosNetCore.Models;
-using ControlDeGastosNetCore.Services;
-using ControlDeGastosNetCore.Viewmodels;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Text;
+using System.Text.Json;
+using ControlDeGastosNetCore.ViewModels;
 
-public class GastosController : Controller
+namespace ControlDeGastosNetCore.Controllers
 {
-    private readonly IGastoService _gastoService;
-    private readonly ICategoriaService _categoriaService;
-
-    public GastosController(IGastoService gastoService, ICategoriaService categoriaService)
+    public class GastoController : Controller
     {
-        _gastoService = gastoService;
-        _categoriaService = categoriaService;
-    }
+        private readonly HttpClient _httpClient;
+        private readonly string _apiBaseUrl = "https://localhost:5001/api/gasto";
 
-    public async Task<IActionResult> Resumen(int? mes, int? anio)
-    {
-        var resumen = await _gastoService.ObtenerResumenDelMes(mes, anio);
-        return View(resumen);
-    }
-
-    public IActionResult Create()
-    {
-        var model = new GastoViewmodel
+        public GastoController(HttpClient httpClient)
         {
-            Fecha = DateTime.Now,
-            Categorias = _categoriaService.GetAll()
-        };
-        return View(model);
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(GastoViewmodel model)
-    {
-        if (!ModelState.IsValid)
-        {
-            model.Categorias = _categoriaService.GetAll();
-            return View(model);
+            _httpClient = httpClient;
         }
 
-        var gasto = new Gasto
+        public async Task<IActionResult> Index()
         {
-            Monto = model.Monto,
-            Fecha = model.Fecha,
-            Detalle = model.Detalle,
-            CategoriaId = model.CategoriaId
-        };
+            var response = await _httpClient.GetAsync(_apiBaseUrl);
+            var json = await response.Content.ReadAsStringAsync();
+            var gastos = JsonSerializer.Deserialize<List<GastoViewModel>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            return View(gastos);
+        }
 
-        await _gastoService.CrearGastoAsync(gasto); 
-        return RedirectToAction(nameof(Resumen)); 
+        public IActionResult Create() => View();
+
+        [HttpPost]
+        public async Task<IActionResult> Create(GastoViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var content = new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync(_apiBaseUrl, content);
+            return response.IsSuccessStatusCode ? RedirectToAction(nameof(Index)) : View(model);
+        }
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            var response = await _httpClient.GetAsync($"{_apiBaseUrl}/{id}");
+            var json = await response.Content.ReadAsStringAsync();
+            var gasto = JsonSerializer.Deserialize<GastoViewModel>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            return View(gasto);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(GastoViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var content = new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json");
+            var response = await _httpClient.PutAsync($"{_apiBaseUrl}/{model.Id}", content);
+            return response.IsSuccessStatusCode ? RedirectToAction(nameof(Index)) : View(model);
+        }
+
+        public async Task<IActionResult> Delete(int id)
+        {
+            var response = await _httpClient.GetAsync($"{_apiBaseUrl}/{id}");
+            var json = await response.Content.ReadAsStringAsync();
+            var gasto = JsonSerializer.Deserialize<GastoViewModel>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            return View(gasto);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var response = await _httpClient.DeleteAsync($"{_apiBaseUrl}/{id}");
+            return RedirectToAction(nameof(Index));
+        }
     }
-
 }
+
 

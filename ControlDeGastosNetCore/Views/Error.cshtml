@@ -1,0 +1,16 @@
+﻿@model ControlDeGastosNetCore.Models.ErrorViewModel
+
+<h1 class="text-danger">Error</h1>
+
+@if (Model.ShowRequestId)
+{
+    <p>
+        <strong>Request ID:</strong> <code>@Model.RequestId</code>
+    </p>
+}
+else
+{
+    <p>No se pudo obtener el ID de la solicitud.</p>
+}
+
+<p>Por favor, contactá al administrador si este problema persiste.</p>

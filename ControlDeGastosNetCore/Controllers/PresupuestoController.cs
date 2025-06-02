@@ -1,23 +1,32 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using ControlDeGastosNetCore.Models;
-using ControlDeGastosNetCore.Services;
+﻿using ControlDeGastosMVC.ViewModels;
+using Microsoft.AspNetCore.Mvc;
+using System.Text;
+using System.Text.Json;
 
-namespace ControlDeGastosNetCore.Controllers
+namespace ControlDeGastosMVC.Controllers
 {
     public class PresupuestoController : Controller
     {
-        private readonly IPresupuestoService _presupuestoService;
+        private readonly HttpClient _httpClient;
+        private readonly string _apiBaseUrl = "https://localhost:5001/api/presupuesto"; // Cambiá esto si tu API corre en otro puerto
 
-        public PresupuestoController(IPresupuestoService presupuestoService)
+        public PresupuestoController(HttpClient httpClient)
         {
-            _presupuestoService = presupuestoService;
+            _httpClient = httpClient;
         }
 
         // GET: Presupuesto
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var presupuestos = _presupuestoService.ObtenerTodos();
-            return View(presupuestos);
+            var response = await _httpClient.GetAsync(_apiBaseUrl);
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                var presupuestos = JsonSerializer.Deserialize<List<PresupuestoViewModel>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                return View(presupuestos);
+            }
+
+            return View(new List<PresupuestoViewModel>());
         }
 
         // GET: Presupuesto/Create
@@ -28,72 +37,75 @@ namespace ControlDeGastosNetCore.Controllers
 
         // POST: Presupuesto/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Create(int Mes, int Año, int Monto)
+        public async Task<IActionResult> Create(PresupuestoViewModel model)
         {
-            if (ModelState.IsValid)
-            {
-                if (_presupuestoService.ExistePresupuestoParaMesAnio(Mes, Año))
-                {
-                    ModelState.AddModelError("", "Ya existe un presupuesto para ese mes y año.");
-                    return View(new Presupuesto { Mes = new DateTime(Año, Mes, 1), Año = new DateTime(Año, 1, 1), Monto = Monto });
-                }
+            if (!ModelState.IsValid)
+                return View(model);
 
-                var presupuesto = new Presupuesto
-                {
-                    Mes = new DateTime(Año, Mes, 1),
-                    Año = new DateTime(Año, 1, 1),
-                    Monto = Monto
-                };
+            var content = new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync(_apiBaseUrl, content);
 
-                _presupuestoService.Crear(presupuesto);
+            if (response.IsSuccessStatusCode)
                 return RedirectToAction(nameof(Index));
-            }
 
-            return View(new Presupuesto { Mes = new DateTime(Año, Mes, 1), Año = new DateTime(Año, 1, 1), Monto = Monto });
+            ModelState.AddModelError("", "Error al crear el presupuesto");
+            return View(model);
         }
 
         // GET: Presupuesto/Edit/5
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
-            var presupuesto = _presupuestoService.ObtenerPorId(id);
-            if (presupuesto == null)
+            var response = await _httpClient.GetAsync($"{_apiBaseUrl}/{id}");
+            if (!response.IsSuccessStatusCode)
                 return NotFound();
+
+            var json = await response.Content.ReadAsStringAsync();
+            var presupuesto = JsonSerializer.Deserialize<PresupuestoViewModel>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             return View(presupuesto);
         }
 
         // POST: Presupuesto/Edit/5
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Edit(Presupuesto presupuesto)
+        public async Task<IActionResult> Edit(PresupuestoViewModel model)
         {
-            if (ModelState.IsValid)
-            {
-                _presupuestoService.Editar(presupuesto);
-                return RedirectToAction(nameof(Index));
-            }
+            if (!ModelState.IsValid)
+                return View(model);
 
-            return View(presupuesto);
+            var content = new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json");
+            var response = await _httpClient.PutAsync($"{_apiBaseUrl}/{model.Id}", content);
+
+            if (response.IsSuccessStatusCode)
+                return RedirectToAction(nameof(Index));
+
+            ModelState.AddModelError("", "Error al editar el presupuesto");
+            return View(model);
         }
 
         // GET: Presupuesto/Delete/5
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var presupuesto = _presupuestoService.ObtenerPorId(id);
-            if (presupuesto == null)
+            var response = await _httpClient.GetAsync($"{_apiBaseUrl}/{id}");
+            if (!response.IsSuccessStatusCode)
                 return NotFound();
+
+            var json = await response.Content.ReadAsStringAsync();
+            var presupuesto = JsonSerializer.Deserialize<PresupuestoViewModel>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             return View(presupuesto);
         }
 
-        // POST: Presupuesto/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
+        // POST: Presupuesto/DeleteConfirmed
+        [HttpPost]
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            _presupuestoService.Eliminar(id);
-            return RedirectToAction(nameof(Index));
+            var response = await _httpClient.DeleteAsync($"{_apiBaseUrl}/{id}");
+
+            if (response.IsSuccessStatusCode)
+                return RedirectToAction(nameof(Index));
+
+            ModelState.AddModelError("", "Error al eliminar el presupuesto");
+            return RedirectToAction(nameof(Delete), new { id });
         }
     }
 }

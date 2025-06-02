@@ -1,9 +1,5 @@
-using Microsoft.EntityFrameworkCore;
-using ControlDeGastosNetCore.Models;
-using ControlDeGastosNetCore.Services;
-using ControlDeGastosNetCore.Repository;
-using ControlDeGastosNetCore.Repositories;
 using System.Globalization;
+using ControlDeGastosMVC.Controllers;
 
 namespace ControlDeGastosNetCore
 {
@@ -16,15 +12,9 @@ namespace ControlDeGastosNetCore
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
-            builder.Services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-            builder.Services.AddScoped<IGastoRepository, GastoRepository>();
-            builder.Services.AddScoped<IGastoService, GastoService>();
-            builder.Services.AddScoped<IPresupuestoService, PresupuestoService>();
-            builder.Services.AddScoped<IPresupuestoRepository, PresupuestoRepository>();
-            builder.Services.AddScoped<ICategoriaService, CategoriaService>();
-            builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+            builder.Services.AddHttpClient<PresupuestoController>();
+            builder.Services.AddHttpClient<CategoriaController>();
+            builder.Services.AddHttpClient<GastoController>();
 
             var cultureInfo = new CultureInfo("es-AR");
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;

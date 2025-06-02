@@ -20,6 +20,8 @@ namespace ControlDeGastosAPI
             builder.Services.AddScoped<ICategoriaService, CategoriaService>();
             builder.Services.AddScoped<IPresupuestoRepository, PresupuestoRepository>();
             builder.Services.AddScoped<IPresupuestoService, PresupuestoService>();
+            builder.Services.AddScoped<IGastoRepository, GastoRepository>();
+            builder.Services.AddScoped<IGastoService, GastoService>();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

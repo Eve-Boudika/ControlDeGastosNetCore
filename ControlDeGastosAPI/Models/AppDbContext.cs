@@ -8,6 +8,7 @@ namespace ControlDeGastosAPI.Models
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
         public DbSet<Gasto> Gastos { get; set; }
         public DbSet<Categoria> Categorias { get; set; }
-        
+        public virtual DbSet<Presupuesto> Presupuestos { get; set; }
+
     }
 }

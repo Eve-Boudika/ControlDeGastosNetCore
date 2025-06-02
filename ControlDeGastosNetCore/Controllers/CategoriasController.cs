@@ -1,103 +1,72 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Net;
-using ControlDeGastosNetCore.Models;
-using ControlDeGastosNetCore.Viewmodels;
-using ControlDeGastosNetCore.Services;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
+using ControlDeGastosMVC.ViewModels;
 
-namespace ControlDeGastosNetCore.Controllers
+namespace ControlDeGastosMVC.Controllers
 {
-    public class CategoriasController : Controller
+    public class CategoriaController : Controller
     {
-        private readonly ICategoriaService _categoriaService;
+        private readonly HttpClient _httpClient;
+        private readonly string _apiBaseUrl = "https://localhost:5001/api/categoria";
 
-        public CategoriasController(ICategoriaService categoriaService)
+        public CategoriaController(HttpClient httpClient)
         {
-            _categoriaService = categoriaService;
+            _httpClient = httpClient;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View(_categoriaService.GetAll());
+            var response = await _httpClient.GetAsync(_apiBaseUrl);
+            var json = await response.Content.ReadAsStringAsync();
+            var categorias = JsonSerializer.Deserialize<List<CategoriaViewModel>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            return View(categorias);
         }
 
-        public IActionResult Details(int? id)
-        {
-            if (id == null) return  BadRequest();
-
-            var categoria = _categoriaService.GetById(id.Value);
-            if (categoria == null) return BadRequest();
-
-            return View(categoria);
-        }
-
-        public IActionResult Create()
-        {
-            return View();
-        }
+        public IActionResult Create() => View();
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(CategoriaViewmodel model)
+        public async Task<IActionResult> Create(CategoriaViewModel model)
         {
-            if (ModelState.IsValid)
-            {
-                var categoria = new Categoria
-                {
-                    Id = model.Id,
-                    Nombre = model.Nombre
-                };
+            if (!ModelState.IsValid) return View(model);
 
-                _categoriaService.Create(categoria);
-                return RedirectToAction("Index");
-            }
-
-            return View(model);
+            var content = new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync(_apiBaseUrl, content);
+            return response.IsSuccessStatusCode ? RedirectToAction(nameof(Index)) : View(model);
         }
-        public IActionResult Edit(int? id)
+
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null) return  BadRequest();
-
-            var categoria = _categoriaService.GetById(id.Value);
-            if (categoria == null) return BadRequest();
-
+            var response = await _httpClient.GetAsync($"{_apiBaseUrl}/{id}");
+            var json = await response.Content.ReadAsStringAsync();
+            var categoria = JsonSerializer.Deserialize<CategoriaViewModel>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             return View(categoria);
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(CategoriaViewmodel model)
+        public async Task<IActionResult> Edit(CategoriaViewModel model)
         {
-            if (ModelState.IsValid)
-            {
-                var categoria = new Categoria
-                {
-                    Id = model.Id,
-                    Nombre = model.Nombre
-                };
+            if (!ModelState.IsValid) return View(model);
 
-                _categoriaService.Update(categoria);
-                return RedirectToAction("Index");
-            }
-
-            return View(model);
+            var content = new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json");
+            var response = await _httpClient.PutAsync($"{_apiBaseUrl}/{model.Id}", content);
+            return response.IsSuccessStatusCode ? RedirectToAction(nameof(Index)) : View(model);
         }
 
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null) return BadRequest();
-
-            var categoria = _categoriaService.GetById(id.Value);
-            if (categoria == null) return BadRequest();
-
+            var response = await _httpClient.GetAsync($"{_apiBaseUrl}/{id}");
+            var json = await response.Content.ReadAsStringAsync();
+            var categoria = JsonSerializer.Deserialize<CategoriaViewModel>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             return View(categoria);
         }
 
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
+        [HttpPost]
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            _categoriaService.Delete(id);
-            return RedirectToAction("Index");
+            var response = await _httpClient.DeleteAsync($"{_apiBaseUrl}/{id}");
+            return RedirectToAction(nameof(Index));
         }
     }
 }

@@ -1,13 +1,13 @@
-﻿@model ControlDeGastosNetCore.Viewmodels.GastosResumenViewmodel
+﻿@model ControlDeGastosNetCore.Viewmodels.GastosPorCategoriaViewmodel
 
 @{
-    ViewData["Title"] = "Resumen de Gastos";
+    ViewData["Title"] = "Gastos por Categoría";
 }
 
-<h2 class="mb-4">Resumen de Gastos </h2>
+<h2 class="mb-4">Gastos por Categoría</h2>
 <h3>@Model.Periodo.ToString("MMMM yyyy")</h3>
 
-<form method="get" asp-action="Resumen">
+<form method="get" asp-action="ResumenPorCategoria">
     <div class="row mb-3">
         <div class="col-md-4">
             <select name="mes" class="form-select">
@@ -41,53 +41,23 @@
     </div>
 </form>
 
-
-<div class="row mb-4">
-    <div class="col-md-4">
-        <div class="card text-bg-light mb-3">
-            <div class="card-header">Presupuesto</div>
-            <div class="card-body">
-                <h5 class="card-title">@Model.MontoPresupuesto?.ToString("C") ?? "No definido"</h5>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card text-bg-light mb-3">
-            <div class="card-header">Total Gastado</div>
-            <div class="card-body">
-                <h5 class="card-title">@Model.TotalGastado.ToString("C")</h5>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card text-bg-light mb-3">
-            <div class="card-header">Monto Disponible</div>
-            <div class="card-body">
-                <h5 class="card-title">@Model.MontoDisponible.ToString("C")</h5>
-            </div>
-        </div>
-    </div>
-</div>
-
-@if (Model.Gastos != null && Model.Gastos.Any())
+@if (Model.GastosPorCategoria != null && Model.GastosPorCategoria.Any())
 {
-    <table class="table table-striped">
-        <thead>
+    <table class="table table-bordered">
+        <thead class="table-light">
             <tr>
-                <th>Fecha</th>
                 <th>Categoría</th>
-                <th>Descripción</th>
-                <th>Monto</th>
+                <th>Total Gastado</th>
+                <th>Porcentaje</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var gasto in Model.Gastos)
+            @foreach (var item in Model.GastosPorCategoria)
             {
                 <tr>
-                    <td>@gasto.Fecha.ToString("dd/MM/yyyy")</td>
-                    <td>@gasto.Categoria?.Nombre</td>
-                    <td>@gasto.Detalle</td>
-                    <td>@gasto.Monto.ToString("C")</td>
+                    <td>@item.NombreCategoria</td>
+                    <td>@item.TotalGastado.ToString("C")</td>
+                    <td>@item.Porcentaje.ToString("P1")</td>
                 </tr>
             }
         </tbody>
@@ -95,5 +65,5 @@
 }
 else
 {
-    <div class="alert alert-info">No hay gastos registrados para este período.</div>
+    <div class="alert alert-info">No hay gastos registrados por categoría para este período.</div>
 }
