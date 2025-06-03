@@ -1,6 +1,6 @@
-﻿using ControlDeGastosAPI.Models;
+﻿using ControlDeGastosAPI.DTOs;
+using ControlDeGastosAPI.Models;
 using ControlDeGastosAPI.Repositories;
-using ControlDeGastosAPI.ViewModels;
 
 namespace ControlDeGastosAPI.Services
 {
@@ -34,7 +34,7 @@ namespace ControlDeGastosAPI.Services
             return await _gastoRepository.GetByIdAsync(id);
         }
 
-        public async Task<GastosResumenViewModel> ObtenerResumenDelMes(int? mes, int? anio)
+        public async Task<GastosResumenDTO> ObtenerResumenDelMes(int? mes, int? anio)
         {
             var now = DateTime.Now;
             int mesValue = mes ?? now.Month;
@@ -43,15 +43,36 @@ namespace ControlDeGastosAPI.Services
             var gastos = await _gastoRepository.GetByMonthAndYearAsync(mesValue, anioValue);
             var presupuesto = await _presupuestoRepository.ObtenerPorMesYAnioAsync(mesValue, anioValue);
 
-            return new GastosResumenViewModel
+            var gastoDtos = gastos.Select(g => new GastoDTO
             {
-                Gastos = gastos,
-                TotalGastado = gastos.Sum(g => g.Monto),
+                Id = g.Id,
+                Descripcion = g.Detalle,
+                Monto = g.Monto,
+                Fecha = g.Fecha,
+                CategoriaId = g.CategoriaId,
+                CategoriaNombre = g.Categoria?.Nombre ?? ""
+            }).ToList();
+
+            var categoriaDtos = gastos
+                .Select(g => g.Categoria)
+                .Where(c => c != null)
+                .Distinct()
+                .Select(c => new CategoriaDTO
+                {
+                    Id = c!.Id,
+                    Nombre = c.Nombre
+                })
+                .ToList();
+
+            return new GastosResumenDTO
+            {
+                Gastos = gastoDtos,
+                TotalGastado = gastoDtos.Sum(g => g.Monto),
                 MontoPresupuesto = presupuesto?.Monto,
                 Periodo = new DateTime(anioValue, mesValue, 1),
                 CategoriaSeleccionada = "",
                 CategoriaSeleccionadaId = null,
-                Categorias = gastos.Select(g => g.Categoria).Distinct().ToList()
+                Categorias = categoriaDtos
             };
         }
 

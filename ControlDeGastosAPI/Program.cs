@@ -11,10 +11,20 @@ namespace ControlDeGastosAPI
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            // 1. Agregamos CORS
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", policy =>
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader();
+                });
+            });
 
+            // Add services to the container.
             builder.Services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
             builder.Services.AddScoped<ICategoriaService, CategoriaService>();
@@ -24,7 +34,6 @@ namespace ControlDeGastosAPI
             builder.Services.AddScoped<IGastoService, GastoService>();
 
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
@@ -39,8 +48,10 @@ namespace ControlDeGastosAPI
 
             app.UseHttpsRedirection();
 
-            app.UseAuthorization();
+            // 2. Aplicamos la política CORS
+            app.UseCors("AllowAll");
 
+            app.UseAuthorization();
 
             app.MapControllers();
 

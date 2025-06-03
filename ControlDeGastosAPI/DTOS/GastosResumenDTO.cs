@@ -1,15 +1,14 @@
-﻿using ControlDeGastosAPI.Models;
-
-namespace ControlDeGastosAPI.ViewModels
+﻿namespace ControlDeGastosAPI.DTOs
 {
-    public class GastosResumenViewModel
+    public class GastosResumenDTO
     {
-        public List<Gasto> Gastos { get; set; } = new();
+        public List<GastoDTO> Gastos { get; set; } = new();
         public int TotalGastado { get; set; }
         public int? MontoPresupuesto { get; set; }
         public DateTime Periodo { get; set; }
         public string CategoriaSeleccionada { get; set; } = "";
         public int? CategoriaSeleccionadaId { get; set; }
-        public List<Categoria> Categorias { get; set; } = new();
+        public List<CategoriaDTO> Categorias { get; set; } = new();
     }
 }
+

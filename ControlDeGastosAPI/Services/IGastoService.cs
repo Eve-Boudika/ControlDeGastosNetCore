@@ -1,5 +1,5 @@
-﻿using ControlDeGastosAPI.Models;
-using ControlDeGastosAPI.ViewModels;
+﻿using ControlDeGastosAPI.DTOs;
+using ControlDeGastosAPI.Models;
 
 namespace ControlDeGastosAPI.Services
 {
@@ -10,6 +10,6 @@ namespace ControlDeGastosAPI.Services
         Task CreateAsync(Gasto gasto);
         Task UpdateAsync(Gasto gasto);
         Task DeleteAsync(int id);
-        Task<GastosResumenViewModel> ObtenerResumenDelMes(int? mes, int? anio);
+        Task<GastosResumenDTO> ObtenerResumenDelMes(int? mes, int? anio);
     }
 }
