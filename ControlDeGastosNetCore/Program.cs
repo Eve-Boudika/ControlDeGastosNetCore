@@ -15,7 +15,7 @@ namespace ControlDeGastosNetCore
 
             builder.Services.AddHttpClient<PresupuestoController>();
             builder.Services.AddHttpClient<CategoriaController>();
-            builder.Services.AddHttpClient<GastoController>();
+            builder.Services.AddHttpClient<GastosController>();
 
             var cultureInfo = new CultureInfo("es-AR");
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;

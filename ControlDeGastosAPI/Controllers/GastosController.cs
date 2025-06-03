@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using ControlDeGastosAPI.Models;
+using ControlDeGastosAPI.Services;
+using ControlDeGastosAPI.DTOs;
 
 namespace ControlDeGastosAPI.Controllers;
 
@@ -8,42 +9,37 @@ namespace ControlDeGastosAPI.Controllers;
 [Route("api/[controller]")]
 public class GastosController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly IGastoService _gastoService;
 
-    public GastosController(AppDbContext context)
+    public GastosController(IGastoService gastoService)
     {
-        _context = context;
+        _gastoService = gastoService;
     }
 
     // GET: api/gastos
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Gasto>>> GetGastos()
     {
-        return await _context.Gastos.Include(g => g.Categoria).ToListAsync();
+        var gastos = await _gastoService.GetAllAsync();
+        return Ok(gastos);
     }
 
     // GET: api/gastos/5
     [HttpGet("{id}")]
     public async Task<ActionResult<Gasto>> GetGasto(int id)
     {
-        var gasto = await _context.Gastos.Include(g => g.Categoria)
-                                         .FirstOrDefaultAsync(g => g.Id == id);
-
+        var gasto = await _gastoService.GetByIdAsync(id);
         if (gasto == null)
-        {
             return NotFound();
-        }
 
-        return gasto;
+        return Ok(gasto);
     }
 
     // POST: api/gastos
     [HttpPost]
-    public async Task<ActionResult<Gasto>> CreateGasto(Gasto gasto)
+    public async Task<ActionResult> CreateGasto(Gasto gasto)
     {
-        _context.Gastos.Add(gasto);
-        await _context.SaveChangesAsync();
-
+        await _gastoService.CreateAsync(gasto);
         return CreatedAtAction(nameof(GetGasto), new { id = gasto.Id }, gasto);
     }
 
@@ -52,28 +48,13 @@ public class GastosController : ControllerBase
     public async Task<IActionResult> UpdateGasto(int id, Gasto gasto)
     {
         if (id != gasto.Id)
-        {
             return BadRequest();
-        }
 
-        _context.Entry(gasto).State = EntityState.Modified;
+        var existingGasto = await _gastoService.GetByIdAsync(id);
+        if (existingGasto == null)
+            return NotFound();
 
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!GastoExists(id))
-            {
-                return NotFound();
-            }
-            else
-            {
-                throw;
-            }
-        }
-
+        await _gastoService.UpdateAsync(gasto);
         return NoContent();
     }
 
@@ -81,45 +62,20 @@ public class GastosController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteGasto(int id)
     {
-        var gasto = await _context.Gastos.FindAsync(id);
-        if (gasto == null)
-        {
+        var existingGasto = await _gastoService.GetByIdAsync(id);
+        if (existingGasto == null)
             return NotFound();
-        }
 
-        _context.Gastos.Remove(gasto);
-        await _context.SaveChangesAsync();
-
+        await _gastoService.DeleteAsync(id);
         return NoContent();
     }
 
     // GET: api/gastos/resumen?mes=6&anio=2025
     [HttpGet("resumen")]
-    public async Task<ActionResult<object>> ObtenerResumenDelMes(int? mes, int? anio)
+    public async Task<ActionResult<GastosResumenDTO>> ObtenerResumenDelMes(int? mes, int? anio)
     {
-        var fechaActual = DateTime.Now;
-        int mesValor = mes ?? fechaActual.Month;
-        int anioValor = anio ?? fechaActual.Year;
-
-        var gastos = await _context.Gastos
-            .Include(g => g.Categoria)
-            .Where(g => g.Fecha.Month == mesValor && g.Fecha.Year == anioValor)
-            .ToListAsync();
-
-        var totalGastado = gastos.Sum(g => g.Monto);
-
-        return Ok(new
-        {
-            TotalGastado = totalGastado,
-            Periodo = new DateTime(anioValor, mesValor, 1),
-            Gastos = gastos,
-            Categorias = gastos.Select(g => g.Categoria).Distinct().ToList()
-        });
-    }
-
-    private bool GastoExists(int id)
-    {
-        return _context.Gastos.Any(e => e.Id == id);
+        var resumen = await _gastoService.ObtenerResumenDelMes(mes, anio);
+        return Ok(resumen);
     }
 }
 

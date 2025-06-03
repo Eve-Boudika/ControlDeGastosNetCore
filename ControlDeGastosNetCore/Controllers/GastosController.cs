@@ -5,12 +5,12 @@ using ControlDeGastosNetCore.ViewModels;
 
 namespace ControlDeGastosNetCore.Controllers
 {
-    public class GastoController : Controller
+    public class GastosController : Controller
     {
         private readonly HttpClient _httpClient;
-        private readonly string _apiBaseUrl = "https://localhost:5001/api/gasto";
+        private readonly string _apiBaseUrl = "https://localhost:5001/api/gastos";
 
-        public GastoController(HttpClient httpClient)
+        public GastosController(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
@@ -22,6 +22,22 @@ namespace ControlDeGastosNetCore.Controllers
             var gastos = JsonSerializer.Deserialize<List<GastoViewModel>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             return View(gastos);
         }
+
+        //Esto ver porque me pide que use el dto de la api, está bien?
+
+        //public async Task<IActionResult> Resumen(int? mes, int? anio)
+        //{
+        //    var url = $"{_apiBaseUrl}/resumen?mes={mes}&anio={anio}";
+        //    var response = await _httpClient.GetAsync(url);
+
+        //    if (!response.IsSuccessStatusCode)
+        //        return View("Error"); // o alguna vista amigable
+
+        //    var json = await response.Content.ReadAsStringAsync();
+        //    var resumen = JsonSerializer.Deserialize<GastosResumenDTO>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+        //    return View(resumen);
+        //}
 
         public IActionResult Create() => View();
 
