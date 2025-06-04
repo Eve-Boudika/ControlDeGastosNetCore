@@ -1,4 +1,4 @@
-﻿@model ControlDeGastosNetCore.Viewmodels.GastosPorCategoriaViewmodel
+﻿@model ControlDeGastosNetCore.DTO.GastosResumenDTO
 
 @{
     ViewData["Title"] = "Gastos por Categoría";
@@ -7,7 +7,7 @@
 <h2 class="mb-4">Gastos por Categoría</h2>
 <h3>@Model.Periodo.ToString("MMMM yyyy")</h3>
 
-<form method="get" asp-action="ResumenPorCategoria">
+<form method="get" asp-action="resumen">
     <div class="row mb-3">
         <div class="col-md-4">
             <select name="mes" class="form-select">
@@ -41,7 +41,18 @@
     </div>
 </form>
 
-@if (Model.GastosPorCategoria != null && Model.GastosPorCategoria.Any())
+@{
+    var gastosPorCategoria = Model.Gastos
+        .GroupBy(g => g.CategoriaNombre)
+        .Select(grupo => new
+        {
+            NombreCategoria = grupo.Key,
+            TotalGastado = grupo.Sum(g => g.Monto),
+            Porcentaje = Model.TotalGastado > 0 ? (decimal)grupo.Sum(g => g.Monto) / Model.TotalGastado : 0
+        }).ToList();
+}
+
+@if (gastosPorCategoria.Any())
 {
     <table class="table table-bordered">
         <thead class="table-light">
@@ -52,7 +63,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model.GastosPorCategoria)
+            @foreach (var item in gastosPorCategoria)
             {
                 <tr>
                     <td>@item.NombreCategoria</td>
@@ -65,5 +76,5 @@
 }
 else
 {
-    <div class="alert alert-info">No hay gastos registrados por categoría para este período.</div>
+    <div class="alert alert-info">No hay gastos registrados para este período.</div>
 }

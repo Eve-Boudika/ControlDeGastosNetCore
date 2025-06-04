@@ -1,4 +1,5 @@
 using System.Globalization;
+using ControlDeGastosAPI.Services;
 using ControlDeGastosMVC.Controllers;
 using ControlDeGastosNetCore.Controllers;
 
@@ -12,6 +13,13 @@ namespace ControlDeGastosNetCore
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddHttpClient<GastoService>(client =>
+            {
+                var configuration = builder.Configuration;
+                var baseUrl = configuration.GetValue<string>("ApiSettings:BaseUrl");
+                client.BaseAddress = new Uri(baseUrl);
+            });
 
             builder.Services.AddHttpClient<PresupuestoController>();
             builder.Services.AddHttpClient<CategoriaController>();

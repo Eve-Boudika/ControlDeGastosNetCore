@@ -2,13 +2,14 @@
 using System.Text;
 using System.Text.Json;
 using ControlDeGastosNetCore.ViewModels;
+using ControlDeGastosNetCore.DTO;
 
 namespace ControlDeGastosNetCore.Controllers
 {
     public class GastosController : Controller
     {
         private readonly HttpClient _httpClient;
-        private readonly string _apiBaseUrl = "https://localhost:5001/api/gastos";
+        private readonly string _apiBaseUrl = "http://localhost:5270/api/gastos";
 
         public GastosController(HttpClient httpClient)
         {
@@ -23,21 +24,20 @@ namespace ControlDeGastosNetCore.Controllers
             return View(gastos);
         }
 
-        //Esto ver porque me pide que use el dto de la api, está bien?
 
-        //public async Task<IActionResult> Resumen(int? mes, int? anio)
-        //{
-        //    var url = $"{_apiBaseUrl}/resumen?mes={mes}&anio={anio}";
-        //    var response = await _httpClient.GetAsync(url);
+        public async Task<IActionResult> resumen(int? mes, int? anio)
+        {
+            var url = $"{_apiBaseUrl}/resumen?mes={mes}&anio={anio}";
+            var response = await _httpClient.GetAsync(url);
 
-        //    if (!response.IsSuccessStatusCode)
-        //        return View("Error"); // o alguna vista amigable
+            if (!response.IsSuccessStatusCode)
+                return View("error"); 
 
-        //    var json = await response.Content.ReadAsStringAsync();
-        //    var resumen = JsonSerializer.Deserialize<GastosResumenDTO>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var json = await response.Content.ReadAsStringAsync();
+            var resumen = JsonSerializer.Deserialize<GastosResumenDTO>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-        //    return View(resumen);
-        //}
+            return View(resumen);
+        }
 
         public IActionResult Create() => View();
 

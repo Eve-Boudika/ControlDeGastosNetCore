@@ -1,4 +1,4 @@
-﻿namespace ControlDeGastosAPI.DTOs
+﻿namespace ControlDeGastosNetCore.DTO
 {
     public class GastoDTO
     {
