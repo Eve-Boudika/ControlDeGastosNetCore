@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ControlDeGastosNetCore.Models.Categoria>
+﻿@model IEnumerable<ControlDeGastosMVC.ViewModels.CategoriaViewModel>
 
 @{
     ViewBag.Title = "Categorías";
@@ -18,12 +18,14 @@
         </tr>
     </thead>
     <tbody>
+
         @if (!Model.Any())
         {
             <tr>
                 <td colspan="2" class="text-center text-muted">No hay categorías creadas aún.</td>
             </tr>
         }
+
         else
         {
             @foreach (var categoria in Model)

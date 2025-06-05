@@ -1,17 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
 using System.Text;
-using System.Text.Json;
+using Newtonsoft.Json;
 using ControlDeGastosMVC.ViewModels;
 
 namespace ControlDeGastosMVC.Controllers
 {
-    public class CategoriaController : Controller
+    public class CategoriasController : Controller
     {
         private readonly HttpClient _httpClient;
-        private readonly string _apiBaseUrl = "https://localhost:5001/api/categoria";
+        private readonly string _apiBaseUrl = "http://localhost:5270/api/categorias";
 
-        public CategoriaController(HttpClient httpClient)
+        public CategoriasController(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
@@ -20,7 +20,7 @@ namespace ControlDeGastosMVC.Controllers
         {
             var response = await _httpClient.GetAsync(_apiBaseUrl);
             var json = await response.Content.ReadAsStringAsync();
-            var categorias = JsonSerializer.Deserialize<List<CategoriaViewModel>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var categorias = JsonConvert.DeserializeObject<List<CategoriaViewModel>>(json);
             return View(categorias);
         }
 
@@ -31,7 +31,9 @@ namespace ControlDeGastosMVC.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
-            var content = new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json");
+            var json = JsonConvert.SerializeObject(model);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
             var response = await _httpClient.PostAsync(_apiBaseUrl, content);
             return response.IsSuccessStatusCode ? RedirectToAction(nameof(Index)) : View(model);
         }
@@ -40,7 +42,7 @@ namespace ControlDeGastosMVC.Controllers
         {
             var response = await _httpClient.GetAsync($"{_apiBaseUrl}/{id}");
             var json = await response.Content.ReadAsStringAsync();
-            var categoria = JsonSerializer.Deserialize<CategoriaViewModel>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var categoria = JsonConvert.DeserializeObject<CategoriaViewModel>(json);
             return View(categoria);
         }
 
@@ -49,24 +51,41 @@ namespace ControlDeGastosMVC.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
-            var content = new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json");
+            var json = JsonConvert.SerializeObject(model);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
             var response = await _httpClient.PutAsync($"{_apiBaseUrl}/{model.Id}", content);
             return response.IsSuccessStatusCode ? RedirectToAction(nameof(Index)) : View(model);
         }
 
+        [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
             var response = await _httpClient.GetAsync($"{_apiBaseUrl}/{id}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ViewBag.Error = "No se pudo obtener la categoría.";
+                return View("Error");
+            }
+
             var json = await response.Content.ReadAsStringAsync();
-            var categoria = JsonSerializer.Deserialize<CategoriaViewModel>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var categoria = JsonConvert.DeserializeObject<CategoriaViewModel>(json);
             return View(categoria);
         }
 
-        [HttpPost]
+        [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var response = await _httpClient.DeleteAsync($"{_apiBaseUrl}/{id}");
-            return RedirectToAction(nameof(Index));
+
+            if (response.IsSuccessStatusCode)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            ViewBag.Error = "No se pudo eliminar la categoría.";
+            return View("Error");
         }
     }
 }

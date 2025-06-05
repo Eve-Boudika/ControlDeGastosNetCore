@@ -1,4 +1,4 @@
-﻿@model ControlDeGastosNetCore.Models.Categoria
+﻿@model ControlDeGastosMVC.ViewModels.CategoriaViewModel
 
 @{
     ViewData["Title"] = "Eliminar Categoría";
@@ -12,8 +12,7 @@
     <strong>Nombre:</strong> @Model.Nombre
 </div>
 
-<form asp-action="DeleteConfirmed" method="post">
-    <input type="hidden" asp-for="Id" />
-    <button type="submit" class="btn btn-danger">Sí, eliminar</button>
-    <a asp-action="Resumen" class="btn btn-secondary">Cancelar</a>
+
+<form asp-action="Delete" method="post" asp-route-id="@Model.Id">
+    <button type="submit" class="btn btn-danger">Eliminar</button>
 </form>

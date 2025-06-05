@@ -1,7 +1,8 @@
 using System.Globalization;
-using ControlDeGastosAPI.Services;
-using ControlDeGastosMVC.Controllers;
-using ControlDeGastosNetCore.Controllers;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using System;
 
 namespace ControlDeGastosNetCore
 {
@@ -11,31 +12,22 @@ namespace ControlDeGastosNetCore
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-            builder.Services.AddControllersWithViews();
-
-            builder.Services.AddHttpClient<GastoService>(client =>
-            {
-                var configuration = builder.Configuration;
-                var baseUrl = configuration.GetValue<string>("ApiSettings:BaseUrl");
-                client.BaseAddress = new Uri(baseUrl);
-            });
-
-            builder.Services.AddHttpClient<PresupuestoController>();
-            builder.Services.AddHttpClient<CategoriaController>();
-            builder.Services.AddHttpClient<GastosController>();
-
+            // Cultura para Argentina
             var cultureInfo = new CultureInfo("es-AR");
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
             CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
+            // MVC
+            builder.Services.AddControllersWithViews();
+
+            // Registro general de HttpClient (no especificamos servicios)
+            builder.Services.AddHttpClient();
+
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
@@ -54,3 +46,4 @@ namespace ControlDeGastosNetCore
         }
     }
 }
+

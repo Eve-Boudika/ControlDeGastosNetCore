@@ -46,7 +46,7 @@ namespace ControlDeGastosAPI.Services
             var gastoDtos = gastos.Select(g => new GastoDTO
             {
                 Id = g.Id,
-                Descripcion = g.Detalle,
+                Detalle = g.Detalle,
                 Monto = g.Monto,
                 Fecha = g.Fecha,
                 CategoriaId = g.CategoriaId,
