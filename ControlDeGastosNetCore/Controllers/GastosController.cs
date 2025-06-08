@@ -72,7 +72,7 @@ namespace ControlDeGastosNetCore.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(GastoViewmodel model)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid is false)
             {
                 model.Categorias = await ObtenerCategoriasAsync();
                 return View(model);

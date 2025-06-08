@@ -2,6 +2,7 @@ using ControlDeGastosAPI.Models;
 using ControlDeGastosAPI.Repositories;
 using ControlDeGastosAPI.Services;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace ControlDeGastosAPI
 {
@@ -36,6 +37,20 @@ namespace ControlDeGastosAPI
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+
+            // Configuramos Serilog
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug() // Podés usar .Information() en producción
+                .WriteTo.Console()
+                .WriteTo.File("Logs/log.txt", rollingInterval: RollingInterval.Day) // Un archivo por día
+                .CreateLogger();
+
+            builder.Host.UseSerilog(); // Integramos Serilog
+
+
+
+
 
             var app = builder.Build();
 

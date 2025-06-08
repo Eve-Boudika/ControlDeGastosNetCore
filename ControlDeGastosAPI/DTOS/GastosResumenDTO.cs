@@ -1,4 +1,4 @@
-﻿namespace ControlDeGastosAPI.DTOs
+﻿namespace ControlDeGastosAPI.DTOS
 {
     public class GastosResumenDTO
     {

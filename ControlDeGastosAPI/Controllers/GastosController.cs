@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ControlDeGastosAPI.Models;
 using ControlDeGastosAPI.Services;
-using ControlDeGastosAPI.DTOs;
+using ControlDeGastosAPI.DTOS;
 
 namespace ControlDeGastosAPI.Controllers;
 
@@ -37,10 +37,17 @@ public class GastosController : ControllerBase
 
     // POST: api/gastos
     [HttpPost]
-    public async Task<ActionResult> CreateGasto(Gasto gasto)
+    public async Task<GastoPostDTORes> CreateGasto(GastoPostDTOReq gastoPostDTOReq)
     {
-        await _gastoService.CreateAsync(gasto);
-        return CreatedAtAction(nameof(GetGasto), new { id = gasto.Id }, gasto);
+        Gasto gasto = new Gasto
+        {
+            Monto = gastoPostDTOReq.Monto,
+            Fecha = gastoPostDTOReq.Fecha,
+            Detalle = gastoPostDTOReq.Detalle,
+            CategoriaId = gastoPostDTOReq.CategoriaId
+        };
+
+        return await _gastoService.CreateAsync(gasto);
     }
 
     // PUT: api/gastos/5

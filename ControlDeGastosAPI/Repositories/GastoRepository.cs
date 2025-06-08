@@ -1,20 +1,33 @@
 ﻿using ControlDeGastosAPI.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 
 namespace ControlDeGastosAPI.Repositories
 {
     public class GastoRepository : IGastoRepository
     {
         private readonly AppDbContext _context;
+        private readonly ILogger<GastoRepository> _logger;
 
-        public GastoRepository(AppDbContext context)
+        public GastoRepository(AppDbContext context, ILogger<GastoRepository> logger)
         {
             _context = context;
+            _logger = logger;
         }
-        public async Task AddAsync(Gasto gasto)
+        public async Task<int> AddAsync(Gasto gasto)
         {
-            await _context.Gastos.AddAsync(gasto);
-            await _context.SaveChangesAsync();
+            try
+            {
+                var responeId = await _context.Gastos.AddAsync(gasto);//responde id insertado
+                var responseInsert = await _context.SaveChangesAsync();//podrias manejar exepcion si response insert no retorna 1
+                return responeId.Entity.Id; //retorna el id del gasto insertado
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation("Post creado con errores ", ex.InnerException.ToString());
+                throw new ArgumentException("Error al crear entidad");
+            }
+
         }
 
         public async Task DeleteAsync(int id)
@@ -29,7 +42,7 @@ namespace ControlDeGastosAPI.Repositories
 
         public async Task<List<Gasto>> GetAllAsync()
         {
-            return await _context.Gastos.Include(g => g.Categoria).ToListAsync();
+            return await _context.Gastos.ToListAsync();
         }
 
         public async Task<Gasto?> GetByIdAsync(int id)

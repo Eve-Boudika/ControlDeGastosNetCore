@@ -1,0 +1,11 @@
+﻿@{
+    ViewBag.Title = "Éxito";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // o null si es sin layout
+}
+
+<div class="alert alert-success" role="alert" style="margin-top: 20px;">
+    <h4 class="alert-heading">¡Éxito!</h4>
+    <p>La operación se realizó correctamente.</p>
+    <hr />
+    <p class="mb-0">Podés volver al <a href="@Url.Action("Index", "Home")">inicio</a> o continuar navegando.</p>
+</div>

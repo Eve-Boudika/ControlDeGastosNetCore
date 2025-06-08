@@ -19,11 +19,7 @@ public class GastoViewmodel
     public int CategoriaId { get; set; }
 
     public string? Detalle { get; set; }
-
-    // Nombre legible (por si lo necesitás para mostrar en otras vistas)
     public string? CategoriaNombre { get; set; }
-
-    // Lista para el DropDownList
     public List<SelectListItem>? Categorias { get; set; }
 
 }

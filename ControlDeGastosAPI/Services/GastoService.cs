@@ -1,4 +1,4 @@
-﻿using ControlDeGastosAPI.DTOs;
+﻿using ControlDeGastosAPI.DTOS;
 using ControlDeGastosAPI.Models;
 using ControlDeGastosAPI.Repositories;
 
@@ -14,9 +14,11 @@ namespace ControlDeGastosAPI.Services
             _gastoRepository = gastoRepository;
             _presupuestoRepository = presupuestoRepository;
         }
-        public async Task CreateAsync(Gasto gasto)
+        public async Task<GastoPostDTORes> CreateAsync(Gasto gasto)
         {
-            await _gastoRepository.AddAsync(gasto);
+            GastoPostDTORes gastoPostDTORes = new GastoPostDTORes();
+            gastoPostDTORes.Id = await _gastoRepository.AddAsync(gasto);
+            return gastoPostDTORes;
         }
 
         public async Task DeleteAsync(int id)

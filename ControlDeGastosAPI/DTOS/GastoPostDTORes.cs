@@ -1,8 +1,7 @@
 ﻿namespace ControlDeGastosAPI.DTOS
 {
-    public class CategoriaDTO
+    public class GastoPostDTORes
     {
         public int Id { get; set; }
-        public string Nombre { get; set; } = "";
     }
 }
