@@ -26,13 +26,24 @@ public class GastosController : ControllerBase
 
     // GET: api/gastos/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<Gasto>> GetGasto(int id)
+    public async Task<ActionResult<GastoDeleteDTORes>> GetGasto(int id)
     {
-        var gasto = await _gastoService.GetByIdAsync(id);
+        Gasto gasto = await _gastoService.GetByIdAsync(id);
+
+        GastoDeleteDTORes gastoDeleteDTORes = new GastoDeleteDTORes
+        {
+            Id = gasto.Id,
+            Monto = gasto.Monto,
+            Fecha = gasto.Fecha,
+            Detalle = gasto.Detalle,
+            CategoriaId = gasto.CategoriaId
+        };
+
+
         if (gasto == null)
             return NotFound();
 
-        return Ok(gasto);
+        return Ok(gastoDeleteDTORes);
     }
 
     // POST: api/gastos

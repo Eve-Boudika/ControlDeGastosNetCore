@@ -4,8 +4,10 @@
     ViewData["Title"] = "Gastos por Categoría";
 }
 
-<h2 class="mb-4">Gastos por Categoría</h2>
-<h3>@Model.Periodo.ToString("MMMM yyyy")</h3>
+
+
+<h2 class="mb-4"> Resumen de Gastos </h2>
+<h3>@Model.Periodo.ToString("MMMM yyyy") TOTAL: @Model.TotalGastado.ToString("C")</h3>
 
 <form method="get" asp-action="resumen">
     <div class="row mb-3">
@@ -20,7 +22,7 @@
                 }
             </select>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <select name="anio" class="form-select">
                 @{
                     int anioActual = DateTime.Now.Year;
@@ -35,21 +37,47 @@
                 }
             </select>
         </div>
-        <div class="col-md-4">
-            <button type="submit" class="btn btn-primary">Filtrar</button>
+        <div class="col-md-3">
+            <select name="categoria" class="form-select">
+                <option value="">-- Todas las Categorías --</option>
+                @foreach (var categoria in Model.Gastos.Select(g => g.CategoriaNombre).Distinct())
+                {
+                    <option value="@categoria" selected="@(categoria == Context.Request.Query["categoria"].ToString() ? "selected" : null)">
+                        @categoria
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Filtrar</button>
         </div>
     </div>
 </form>
 
 @{
-    var gastosPorCategoria = Model.Gastos
-        .GroupBy(g => g.CategoriaNombre)
-        .Select(grupo => new
+    var categoriaSeleccionada = Context.Request.Query["categoria"].ToString();
+
+    var gastosFiltrados = string.IsNullOrEmpty(categoriaSeleccionada)
+        ? Model.Gastos
+        : Model.Gastos.Where(g => g.CategoriaNombre == categoriaSeleccionada);
+
+    var gastosPorCategoria = gastosFiltrados
+        .Select(g => new
         {
-            NombreCategoria = grupo.Key,
-            TotalGastado = grupo.Sum(g => g.Monto),
-            Porcentaje = Model.TotalGastado > 0 ? (decimal)grupo.Sum(g => g.Monto) / Model.TotalGastado : 0
+            Id = g.Id,
+            NombreCategoria = g.CategoriaNombre,
+            Detalle = g.Detalle,
+            Fecha = g.Fecha.ToShortDateString(),
+            TotalGastado = g.Monto,
+            Porcentaje = Model.TotalGastado > 0 ? (decimal)g.Monto / Model.TotalGastado : 0
         }).ToList();
+
+    var totalFiltrado = gastosFiltrados.Sum(g => g.Monto);
+}
+
+@if (!string.IsNullOrEmpty(categoriaSeleccionada))
+{
+    <h4>Gastos en <strong>@categoriaSeleccionada</strong> - Total: @totalFiltrado.ToString("C")</h4>
 }
 
 @if (gastosPorCategoria.Any())
@@ -58,8 +86,11 @@
         <thead class="table-light">
             <tr>
                 <th>Categoría</th>
+                <th>Detalle</th>
+                <th>Fecha</th>
                 <th>Total Gastado</th>
                 <th>Porcentaje</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -67,8 +98,14 @@
             {
                 <tr>
                     <td>@item.NombreCategoria</td>
+                    <td>@item.Detalle</td>
+                    <td>@item.Fecha</td>
                     <td>@item.TotalGastado.ToString("C")</td>
                     <td>@item.Porcentaje.ToString("P1")</td>
+                    <td>
+                        <a href="@Url.Action("Edit", "Gastos", new { id = item.Id })" class="btn btn-sm btn-warning me-1">Editar</a>
+                        <a asp-action="Delete" asp-controller="Gastos" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Eliminar</a>
+                    </td>
                 </tr>
             }
         </tbody>
@@ -78,3 +115,9 @@ else
 {
     <div class="alert alert-info">No hay gastos registrados para este período.</div>
 }
+
+<div class="mt-4">
+    <a href="@Url.Action("Create", "Gastos")" class="btn btn-success">
+        Agregar Gasto
+    </a>
+</div>
