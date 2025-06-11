@@ -58,8 +58,9 @@
     var categoriaSeleccionada = Context.Request.Query["categoria"].ToString();
 
     var gastosFiltrados = string.IsNullOrEmpty(categoriaSeleccionada)
-        ? Model.Gastos
-        : Model.Gastos.Where(g => g.CategoriaNombre == categoriaSeleccionada);
+    ? Model.Gastos.OrderBy(g => g.Fecha)
+    : Model.Gastos.Where(g => g.CategoriaNombre == categoriaSeleccionada)
+                 .OrderBy(g => g.Fecha);
 
     var gastosPorCategoria = gastosFiltrados
         .Select(g => new
