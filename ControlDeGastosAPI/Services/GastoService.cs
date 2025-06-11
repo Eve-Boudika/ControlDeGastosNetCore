@@ -78,9 +78,17 @@ namespace ControlDeGastosAPI.Services
             };
         }
 
-        public async Task UpdateAsync(Gasto gasto)
+        public async Task<GastoUpdateDTO>UpdateAsync(Gasto gasto)
         {
             await _gastoRepository.UpdateAsync(gasto);
+            return new GastoUpdateDTO
+            {
+                Id = gasto.Id,
+                Fecha = gasto.Fecha,
+                Monto = gasto.Monto,
+                CategoriaId = gasto.CategoriaId,
+                Detalle = gasto.Detalle
+            };
         }
     }
 }

@@ -63,15 +63,9 @@ public class GastosController : ControllerBase
 
     // PUT: api/gastos/5
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateGasto(int id, GastoUpdateDTO gastoDto)
+    public async Task<GastoUpdateDTO> UpdateGasto(int id, GastoUpdateDTO gastoDto)
     {
-        if (id != gastoDto.Id)
-            return BadRequest();
-
-        var existingGasto = await _gastoService.GetByIdAsync(id);
-        if (existingGasto == null)
-            return NotFound();
-
+        
         var gasto = new Gasto
         {
             Id = gastoDto.Id,
@@ -81,8 +75,8 @@ public class GastosController : ControllerBase
             Detalle = gastoDto.Detalle
         };
 
-        await _gastoService.UpdateAsync(gasto);
-        return NoContent();
+        
+        return await _gastoService.UpdateAsync(gasto);
     }
 
     // DELETE: api/gastos/5
