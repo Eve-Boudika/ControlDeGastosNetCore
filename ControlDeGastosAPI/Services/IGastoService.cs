@@ -11,5 +11,6 @@ namespace ControlDeGastosAPI.Services
         Task UpdateAsync(Gasto gasto);
         Task DeleteAsync(int id);
         Task<GastosResumenDTO> ObtenerResumenDelMes(int? mes, int? anio);
+     
     }
 }
