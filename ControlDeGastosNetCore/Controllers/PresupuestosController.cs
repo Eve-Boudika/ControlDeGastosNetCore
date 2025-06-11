@@ -5,12 +5,12 @@ using System.Text.Json;
 
 namespace ControlDeGastosMVC.Controllers
 {
-    public class PresupuestoController : Controller
+    public class PresupuestosController : Controller
     {
         private readonly HttpClient _httpClient;
-        private readonly string _apiBaseUrl = "https://localhost:5001/api/presupuesto"; // Cambiá esto si tu API corre en otro puerto
+        private readonly string _apiBaseUrl = "http://localhost:5270/api/Presupuestos"; 
 
-        public PresupuestoController(HttpClient httpClient)
+        public PresupuestosController(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
