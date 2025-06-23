@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ControlDeGastosAPI.Models;
+using ControlDeGastosAPI.DTOS;
+using ControlDeGastosAPI.Services;
 
 namespace ControlDeGastosAPI.Controllers;
 
@@ -9,10 +11,12 @@ namespace ControlDeGastosAPI.Controllers;
 public class PresupuestosController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly IPresupuestoService _presupuestoService;
 
-    public PresupuestosController(AppDbContext context)
+    public PresupuestosController(AppDbContext context, IPresupuestoService presupuestoService)
     {
         _context = context;
+        _presupuestoService = presupuestoService;
     }
 
     // GET: api/presupuestos
@@ -107,4 +111,14 @@ public class PresupuestosController : ControllerBase
     {
         return _context.Presupuestos.Any(e => e.Id == id);
     }
+
+    // GET: api/presupuestos/resumen?mes=6&anio=2025
+    [HttpGet("resumen")]
+    public async Task<ActionResult<PresupuestoResumenDTO>> ObtenerResumenPresupuesto(int mes, int anio)
+    {
+        var resumen = await _presupuestoService.ObtenerResumenDelMesAsync(mes, anio);
+        return Ok(resumen);
+    }
+
+
 }

@@ -63,5 +63,19 @@ namespace ControlDeGastosAPI.Repositories
             _context.Entry(gasto).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
+
+        public async Task<decimal> ObtenerTotalGastosDelMesAsync(int mes, int anio)
+        {
+            return await _context.Gastos
+                .Where(g => g.Fecha.Month == mes && g.Fecha.Year == anio)
+                .SumAsync(g => g.Monto);
+        }
+
+        Task <int> IGastoRepository.ObtenerTotalGastosDelMesAsync(int mes, int anio)
+        {
+              return  _context.Gastos
+                .Where(g => g.Fecha.Month == mes && g.Fecha.Year == anio)
+                .SumAsync(g => g.Monto);
+        }
     }
 }

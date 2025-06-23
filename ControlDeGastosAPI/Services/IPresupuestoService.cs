@@ -1,4 +1,5 @@
-﻿using ControlDeGastosAPI.Models;
+﻿using ControlDeGastosAPI.DTOS;
+using ControlDeGastosAPI.Models;
 
 namespace ControlDeGastosAPI.Services
 {
@@ -10,6 +11,7 @@ namespace ControlDeGastosAPI.Services
         void Crear(Presupuesto presupuesto);
         void Editar(Presupuesto presupuesto);
         void Eliminar(int id);
+        Task<PresupuestoResumenDTO> ObtenerResumenDelMesAsync(int mes, int anio);
 
     }
 }

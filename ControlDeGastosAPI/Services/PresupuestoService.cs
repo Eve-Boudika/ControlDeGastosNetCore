@@ -1,17 +1,20 @@
 ﻿using ControlDeGastosAPI.Models;
 using ControlDeGastosAPI.Repositories;
+using ControlDeGastosAPI.DTOS;
 
 namespace ControlDeGastosAPI.Services
 {
     public class PresupuestoService : IPresupuestoService
     {
-
         private readonly IPresupuestoRepository _repository;
+        private readonly IGastoRepository _gastoRepository;
 
-        public PresupuestoService(IPresupuestoRepository repository)
+        public PresupuestoService(IPresupuestoRepository repository, IGastoRepository gastoRepository)
         {
             _repository = repository;
+            _gastoRepository = gastoRepository;
         }
+
         public void Crear(Presupuesto presupuesto)
         {
             _repository.Crear(presupuesto);
@@ -41,5 +44,18 @@ namespace ControlDeGastosAPI.Services
         {
             return _repository.ObtenerTodos();
         }
+
+        public async Task<PresupuestoResumenDTO> ObtenerResumenDelMesAsync(int mes, int anio)
+        {
+            var presupuesto = await _repository.ObtenerPorMesYAnioAsync(mes, anio);
+            var gastos = await _gastoRepository.ObtenerTotalGastosDelMesAsync(mes, anio);
+
+            return new PresupuestoResumenDTO
+            {
+                PresupuestoTotal = presupuesto?.Monto ?? 0,
+                GastosTotales = gastos
+            };
+        }
     }
 }
+

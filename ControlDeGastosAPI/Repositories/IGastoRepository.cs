@@ -10,5 +10,6 @@ namespace ControlDeGastosAPI.Repositories
         Task UpdateAsync(Gasto gasto);
         Task DeleteAsync(int id);
         Task<List<Gasto>> GetByMonthAndYearAsync(int mes, int anio);
+        Task<int> ObtenerTotalGastosDelMesAsync(int mes, int anio);
     }
 }

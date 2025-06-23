@@ -12,4 +12,5 @@ namespace ControlDeGastosAPI.Repositories
         void Eliminar(int id);
         Task<Presupuesto?> ObtenerPorMesYAnioAsync(int mes, int anio);
     }
+
 }
